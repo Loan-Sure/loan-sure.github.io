@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Loan Eligibility Calculator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header><div><h1>Personal Loan Eligibility</h1><p>Indicative loan screening & EMI calculator</p></div><span class="badge">Lead Calculator</span></header>
+  <main>
+    <section class="card">
+      <h2>1. Basic Entry Details</h2>
+      <div class="grid">
+        <label>Customer Name<input id="name" type="text" placeholder="Enter customer name"></label>
+        <label>Contact Number<input id="phone" type="tel" maxlength="10" placeholder="10-digit mobile number"></label>
+        <label>Company Name<input id="company" type="text" placeholder="Enter company name"></label>
+        <label>Company Category<select id="category"><option value="preferred">Preferred / Private Ltd</option><option value="standard">Standard / Other</option></select></label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2. Loan Calculator</h2>
+      <div class="grid">
+        <label>Monthly NTH / Salary (₹)<input id="salary" type="number" min="0" step="1000" value="60000"></label>
+        <label>Loan Amount Required (₹)<input id="loan" type="number" min="0" step="10000" value="700000"></label>
+        <label>Tenure (Years)<select id="tenure"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></label>
+      </div>
+      <button id="calculate">Calculate Eligibility</button>
+      <p class="hint">Rule: salary above ₹70,000 can use up to 6 years; otherwise maximum tenure is 5 years.</p>
+    </section>
+
+    <section class="results card">
+      <h2>3. Results</h2>
+      <div class="result-grid">
+        <div><small>Company Category</small><strong id="outCategory">—</strong></div>
+        <div><small>Applicable ROI</small><strong id="outRoi">—</strong></div>
+        <div><small>Estimated EMI</small><strong id="outEmi">—</strong></div>
+        <div><small>Total Interest</small><strong id="outInterest">—</strong></div>
+        <div><small>Total Repayment</small><strong id="outRepayment">—</strong></div>
+        <div><small>Maximum Tenure</small><strong id="outMaxTenure">—</strong></div>
+      </div>
+      <div id="status" class="status">Enter details and calculate.</div>
+      <button id="saveLead" class="secondary">Save Lead</button>
+      <div id="saved" class="saved"></div>
+    </section>
+
+    <section class="card note"><b>Important:</b> This is an indicative calculator for lead screening. Actual lender pricing and approval depend on lender policy, income verification, credit history, employer profile and other checks.</section>
+  </main>
+</div>
+<script src="script.js"></script>
+</body></html>
