@@ -1,52 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Personal Loan Eligibility Calculator</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loan-Sure | Personal Loan Eligibility</title>
+<style>
+:root{
+  --primary:#5b2aa8;
+  --primary2:#7b45d0;
+  --bg:#f5f6fb;
+  --card:#fff;
+  --text:#202124;
+  --muted:#6b7280;
+  --border:#e3e5eb;
+  --success:#087f5b;
+  --danger:#b42318;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.header{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;padding:28px 18px}
+.header-inner{max-width:1050px;margin:auto}
+.logo{font-size:28px;font-weight:800;letter-spacing:.3px}
+.tag{margin-top:6px;opacity:.9}
+.container{max-width:1050px;margin:24px auto;padding:0 18px}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;box-shadow:0 5px 18px rgba(20,20,40,.05)}
+h2{margin:0 0 18px;font-size:20px}
+h3{margin:0 0 14px;font-size:16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+input,select{width:100%;padding:12px 13px;border:1px solid #d5d8e0;border-radius:9px;font-size:14px;outline:none;background:#fff}
+input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,42,168,.1)}
+.full{grid-column:1/-1}
+button{border:0;border-radius:9px;padding:12px 18px;font-weight:700;cursor:pointer}
+.primary{background:var(--primary);color:#fff}
+.primary:hover{background:#49208d}
+.secondary{background:#eeeaf8;color:var(--primary)}
+.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.rule{font-size:12px;color:var(--muted);margin-top:13px;line-height:1.5}
+.result-card{position:sticky;top:18px}
+.result{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{border:1px solid var(--border);border-radius:11px;padding:13px;background:#fafafe}
+.metric span{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
+.metric strong{font-size:17px}
+.status{margin-top:15px;padding:12px;border-radius:10px;font-size:13px;line-height:1.45}
+.neutral{background:#f1f2f6;color:#555}
+.good{background:#e9f8f2;color:var(--success)}
+.bad{background:#fff0ee;color:var(--danger)}
+.note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:16px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(max-width:760px){
+ .grid{grid-template-columns:1fr}
+ .form-grid{grid-template-columns:1fr}
+ .result-card{position:static}
+}
+</style>
 </head>
 <body>
-<div class="wrap">
-  <header><div><h1>Personal Loan Eligibility</h1><p>Indicative loan screening & EMI calculator</p></div><span class="badge">Lead Calculator</span></header>
-  <main>
-    <section class="card">
-      <h2>1. Basic Entry Details</h2>
-      <div class="grid">
-        <label>Customer Name<input id="name" type="text" placeholder="Enter customer name"></label>
-        <label>Contact Number<input id="phone" type="tel" maxlength="10" placeholder="10-digit mobile number"></label>
-        <label>Company Name<input id="company" type="text" placeholder="Enter company name"></label>
-        <label>Company Category<select id="category"><option value="preferred">Preferred / Private Ltd</option><option value="standard">Standard / Other</option></select></label>
-      </div>
-    </section>
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">Loan-Sure</div>
+    <div class="tag">Personal Loan Eligibility & EMI Calculator</div>
+  </div>
+</header>
 
-    <section class="card">
-      <h2>2. Loan Calculator</h2>
-      <div class="grid">
-        <label>Monthly NTH / Salary (₹)<input id="salary" type="number" min="0" step="1000" value="60000"></label>
-        <label>Loan Amount Required (₹)<input id="loan" type="number" min="0" step="10000" value="700000"></label>
-        <label>Tenure (Years)<select id="tenure"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></label>
-      </div>
-      <button id="calculate">Calculate Eligibility</button>
-      <p class="hint">Rule: salary above ₹70,000 can use up to 6 years; otherwise maximum tenure is 5 years.</p>
-    </section>
-
-    <section class="results card">
-      <h2>3. Results</h2>
-      <div class="result-grid">
-        <div><small>Company Category</small><strong id="outCategory">—</strong></div>
-        <div><small>Applicable ROI</small><strong id="outRoi">—</strong></div>
-        <div><small>Estimated EMI</small><strong id="outEmi">—</strong></div>
-        <div><small>Total Interest</small><strong id="outInterest">—</strong></div>
-        <div><small>Total Repayment</small><strong id="outRepayment">—</strong></div>
-        <div><small>Maximum Tenure</small><strong id="outMaxTenure">—</strong></div>
-      </div>
-      <div id="status" class="status">Enter details and calculate.</div>
-      <button id="saveLead" class="secondary">Save Lead</button>
-      <div id="saved" class="saved"></div>
-    </section>
-
-    <section class="card note"><b>Important:</b> This is an indicative calculator for lead screening. Actual lender pricing and approval depend on lender policy, income verification, credit history, employer profile and other checks.</section>
-  </main>
+<main class="container">
+<div class="grid">
+<section class="card">
+<h2>Check Personal Loan Eligibility</h2>
+<h3>Customer Details</h3>
+<div class="form-grid">
+  <div class="field"><label>Customer Name</label><input id="name" placeholder="Enter customer name"></div>
+  <div class="field"><label>Contact Number</label><input id="phone" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number"></div>
+  <div class="field"><label>Company Name</label><input id="company" placeholder="Enter company name"></div>
+  <div class="field"><label>Company Category</label>
+    <select id="category">
+      <option value="preferred">Preferred / Private Ltd</option>
+      <option value="standard">Standard / Other</option>
+    </select>
+  </div>
+  <div class="field"><label>Monthly NTH / Salary (₹)</label><input id="salary" type="number" min="0" value="60000"></div>
+  <div class="field"><label>Loan Amount Required (₹)</label><input id="loan" type="number" min="0" value="700000"></div>
+  <div class="field"><label>Tenure (Years)</label>
+    <select id="tenure"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select>
+  </div>
 </div>
-<script src="script.js"></script>
-</body></html>
+<div class="actions">
+  <button class="primary" onclick="calculate()">Calculate Eligibility</button>
+  <button class="secondary" onclick="resetForm()">Reset</button>
+</div>
+<div class="rule"><b>Tenure rule:</b> Salary above ₹70,000 can use up to 6 years. Otherwise maximum tenure is 5 years.</div>
+</section>
+
+<section class="card result-card">
+<h2>Loan Result</h2>
+<div class="result">
+  <div class="metric"><span>Company Category</span><strong id="rCategory">—</strong></div>
+  <div class="metric"><span>Applicable ROI</span><strong id="rRoi">—</strong></div>
+  <div class="metric"><span>Estimated EMI</span><strong id="rEmi">—</strong></div>
+  <div class="metric"><span>Total Interest</span><strong id="rInterest">—</strong></div>
+  <div class="metric"><span>Total Repayment</span><strong id="rRepay">—</strong></div>
+  <div class="metric"><span>Maximum Tenure</span><strong id="rMaxTenure">—</strong></div>
+</div>
+<div id="status" class="status neutral">Enter details and click Calculate Eligibility.</div>
+<div class="actions">
+  <button class="primary" onclick="saveLead()">Save Lead</button>
+  <button class="secondary" onclick="whatsapp()">WhatsApp</button>
+</div>
+<p class="note"><b>Important:</b> This is an indicative calculator for lead screening. Actual lender pricing and approval depend on lender policy, income verification, credit history, employer profile and other checks.</p>
+</section>
+</div>
+</main>
+<footer>© Loan-Sure • Indicative loan screening tool</footer>
+
+<script>
+const matrix = [
+ {min:14000,max:24999,lo:0,maxLoan:200000, low:29, high:32},
+ {min:14000,max:24999,lo:200001,maxLoan:400000, low:26, high:28},
+ {min:14000,max:24999,lo:400001,maxLoan:Infinity, low:24.99, high:24.99},
+ {min:25000,max:29999,lo:0,maxLoan:400000, low:19, high:21},
+ {min:25000,max:29999,lo:400001,maxLoan:Infinity, low:18, high:19.99},
+ {min:30000,max:49999,lo:0,maxLoan:400000, low:16, high:18.99},
+ {min:30000,max:49999,lo:400001,maxLoan:1000000, low:13.5, high:13.5},
+ {min:50000,max:70000,lo:0,maxLoan:400000, low:13.99, high:13.99},
+ {min:50000,max:70000,lo:400001,maxLoan:1000000, low:12.75, high:12.75},
+ {min:50000,max:70000,lo:1100000,maxLoan:1499000, low:11.99, high:11.99},
+ {min:70001,max:Infinity,lo:0,maxLoan:400000, low:13.5, high:13.5},
+ {min:70001,max:Infinity,lo:400001,maxLoan:1000000, low:12.7, high:12.7},
+ {min:70001,max:Infinity,lo:1100000,maxLoan:1499000, low:11.75, high:11.75},
+ {min:70001,max:Infinity,lo:1500001,maxLoan:Infinity, low:9.99, high:9.99}
+];
+
+function money(n){ return isFinite(n) ? "₹"+Math.round(n).toLocaleString("en-IN") : "—"; }
+
+function findRate(salary, loan, category){
+  const row = matrix.find(x => salary>=x.min && salary<=x.max && loan>=x.lo && loan<=x.maxLoan);
+  if(!row) return null;
+  return category==="preferred" ? row.low : row.high;
+}
+function calculate(){
+  const salary=Number(document.getElementById("salary").value);
+  const loan=Number(document.getElementById("loan").value);
+  const years=Number(document.getElementById("tenure").value);
+  const category=document.getElementById("category").value;
+  const maxTenure=salary>70000?6:5;
+  const roi=findRate(salary,loan,category);
+  document.getElementById("rCategory").textContent=category==="preferred"?"Preferred / Private Ltd":"Standard / Other";
+  document.getElementById("rMaxTenure").textContent=maxTenure+" years";
+  const status=document.getElementById("status");
+  status.className="status";
+  if(!salary || !loan){ status.classList.add("bad"); status.textContent="Please enter salary and loan amount."; return; }
+  if(years>maxTenure){
+    status.classList.add("bad"); status.textContent="Selected tenure exceeds the maximum allowed tenure for this salary.";
+  } else if(!roi){
+    ["rRoi","rEmi","rInterest","rRepay"].forEach(id=>document.getElementById(id).textContent="—");
+    status.classList.add("bad"); status.textContent="Rate not defined for this salary/loan range in the supplied rate matrix.";
+    return;
+  } else {
+    const months=years*12, monthly=roi/100/12;
+    const emi=loan*monthly*Math.pow(1+monthly,months)/(Math.pow(1+monthly,months)-1);
+    const interest=emi*months-loan;
+    document.getElementById("rRoi").textContent=roi+"% p.a.";
+    document.getElementById("rEmi").textContent=money(emi);
+    document.getElementById("rInterest").textContent=money(interest);
+    document.getElementById("rRepay").textContent=money(emi*months);
+    status.classList.add("good"); status.textContent="Indicative result calculated successfully.";
+  }
+}
+function saveLead(){
+  const name=document.getElementById("name").value.trim();
+  const phone=document.getElementById("phone").value.trim();
+  if(!name || !phone){ alert("Please enter customer name and contact number."); return; }
+  const lead={
+    name, phone,
+    company:document.getElementById("company").value,
+    salary:document.getElementById("salary").value,
+    loan:document.getElementById("loan").value,
+    tenure:document.getElementById("tenure").value,
+    savedAt:new Date().toLocaleString()
+  };
+  const leads=JSON.parse(localStorage.getItem("loanSureLeads")||"[]");
+  leads.push(lead); localStorage.setItem("loanSureLeads",JSON.stringify(leads));
+  alert("Lead saved on this browser.");
+}
+function whatsapp(){
+  const phone=document.getElementById("phone").value.replace(/\D/g,"");
+  if(phone.length!==10){alert("Enter a valid 10-digit mobile number.");return;}
+  const text="Hello, I am interested in a Personal Loan. Please contact me regarding eligibility.";
+  window.open("https://wa.me/91"+phone+"?text="+encodeURIComponent(text),"_blank");
+}
+function resetForm(){ location.reload(); }
+</script>
+</body>
+</html>
