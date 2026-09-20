@@ -167,21 +167,67 @@ function calculate(){
     status.classList.add("good"); status.textContent="Indicative result calculated successfully.";
   }
 }
-function saveLead(){
+const LEAD_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxy-kn_0M7qEqRhtS72YBKLL1j2iXilZwL4WzirwzcM2yBtFUTbW2-iufxeIuVMesGJ/exec";
+
+async function saveLead(){
   const name=document.getElementById("name").value.trim();
   const phone=document.getElementById("phone").value.trim();
-  if(!name || !phone){ alert("Please enter customer name and contact number."); return; }
+  const company=document.getElementById("company").value.trim();
+  const category=document.getElementById("category").value;
+  const salary=document.getElementById("salary").value;
+  const loan=document.getElementById("loan").value;
+  const tenure=document.getElementById("tenure").value;
+
+  if(!name || !phone){
+    alert("Please enter customer name and contact number.");
+    return;
+  }
+
+  if(!/^\\d{10}$/.test(phone)){
+    alert("Please enter a valid 10-digit mobile number.");
+    return;
+  }
+
+  // Calculate first so the latest eligibility/ROI/EMI result is captured.
+  calculate();
+
+  const statusText=document.getElementById("status").textContent;
+  const roiText=document.getElementById("rRoi").textContent;
+  const emiText=document.getElementById("rEmi").textContent;
+
   const lead={
-    name, phone,
-    company:document.getElementById("company").value,
-    salary:document.getElementById("salary").value,
-    loan:document.getElementById("loan").value,
-    tenure:document.getElementById("tenure").value,
-    savedAt:new Date().toLocaleString()
+    name,
+    mobile: phone,
+    company,
+    category: category==="preferred" ? "Preferred / Private Ltd" : "Standard / Other",
+    salary,
+    loanAmount: loan,
+    tenure,
+    eligibility: statusText,
+    roi: roiText,
+    emi: emiText
   };
+
+  // Keep a local backup on this browser.
   const leads=JSON.parse(localStorage.getItem("loanSureLeads")||"[]");
-  leads.push(lead); localStorage.setItem("loanSureLeads",JSON.stringify(leads));
-  alert("Lead saved on this browser.");
+  leads.push({...lead, savedAt:new Date().toLocaleString()});
+  localStorage.setItem("loanSureLeads",JSON.stringify(leads));
+
+  try{
+    // no-cors is intentional: Apps Script accepts the POST even though
+    // the browser cannot read the cross-origin response.
+    await fetch(LEAD_WEB_APP_URL,{
+      method:"POST",
+      mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(lead)
+    });
+
+    alert("Lead saved successfully. Thank you!");
+  }catch(error){
+    console.error("Lead submission error:", error);
+    alert("Lead was saved on this browser, but the online submission failed. Please try again.");
+  }
 }
 function whatsapp(){
   const phone=document.getElementById("phone").value.replace(/\D/g,"");
