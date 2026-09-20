@@ -179,7 +179,7 @@ async function autoSaveLead(){
   const phone=document.getElementById("phone").value.trim();
 
   // A lead is saved automatically only when the required contact details are present.
-  if(!name || !/^\\d{10}$/.test(phone) || leadSaving) return;
+  if(!name || !/^\d{10}$/.test(phone) || leadSaving) return;
 
   const key = [
     name,
