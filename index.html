@@ -104,7 +104,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 </div>
 <div id="status" class="status neutral">Enter details and click Calculate Eligibility.</div>
 <div class="actions">
-  <button class="primary" onclick="saveLead()">Save Lead</button>
+  <button class="primary" onclick="saveLead()">Save Lead Manually</button>
   <button class="secondary" onclick="whatsapp()">WhatsApp</button>
 </div>
 <p class="note"><b>Important:</b> This is an indicative calculator for lead screening. Actual lender pricing and approval depend on lender policy, income verification, credit history, employer profile and other checks.</p>
@@ -165,9 +165,69 @@ function calculate(){
     document.getElementById("rInterest").textContent=money(interest);
     document.getElementById("rRepay").textContent=money(emi*months);
     status.classList.add("good"); status.textContent="Indicative result calculated successfully.";
+
+    // Automatically save a completed lead after eligibility is calculated.
+    autoSaveLead();
   }
 }
 const LEAD_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxy-kn_0M7qEqRhtS72YBKLL1j2iXilZwL4WzirwzcM2yBtFUTbW2-iufxeIuVMesGJ/exec";
+let lastAutoSavedKey = "";
+let leadSaving = false;
+
+async function autoSaveLead(){
+  const name=document.getElementById("name").value.trim();
+  const phone=document.getElementById("phone").value.trim();
+
+  // A lead is saved automatically only when the required contact details are present.
+  if(!name || !/^\\d{10}$/.test(phone) || leadSaving) return;
+
+  const key = [
+    name,
+    phone,
+    document.getElementById("company").value.trim(),
+    document.getElementById("salary").value,
+    document.getElementById("loan").value,
+    document.getElementById("tenure").value,
+    document.getElementById("category").value
+  ].join("|");
+
+  // Prevent duplicate automatic submissions for the same calculation.
+  if(key === lastAutoSavedKey) return;
+
+  leadSaving = true;
+  const lead={
+    name,
+    mobile: phone,
+    company: document.getElementById("company").value.trim(),
+    category: document.getElementById("category").value==="preferred" ? "Preferred / Private Ltd" : "Standard / Other",
+    salary: document.getElementById("salary").value,
+    loanAmount: document.getElementById("loan").value,
+    tenure: document.getElementById("tenure").value,
+    eligibility: document.getElementById("status").textContent,
+    roi: document.getElementById("rRoi").textContent,
+    emi: document.getElementById("rEmi").textContent
+  };
+
+  try{
+    await fetch(LEAD_WEB_APP_URL,{
+      method:"POST",
+      mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(lead)
+    });
+
+    const leads=JSON.parse(localStorage.getItem("loanSureLeads")||"[]");
+    leads.push({...lead, savedAt:new Date().toLocaleString()});
+    localStorage.setItem("loanSureLeads",JSON.stringify(leads));
+
+    lastAutoSavedKey=key;
+    document.getElementById("status").textContent="Eligibility calculated and lead saved successfully.";
+  }catch(error){
+    console.error("Automatic lead submission error:", error);
+  }finally{
+    leadSaving=false;
+  }
+}
 
 async function saveLead(){
   const name=document.getElementById("name").value.trim();
